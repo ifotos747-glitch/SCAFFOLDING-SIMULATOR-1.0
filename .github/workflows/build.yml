@@ -31,6 +31,6 @@ jobs:
           test -s dist/SCAFFOLDING-SIMULATOR.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: SCAFFOLDING-SIMULATOR-1.0-WINDOWS
+          name: SCAFFOLDING-SIMULATOR-2.0-WINDOWS
           path: dist/
           if-no-files-found: error
