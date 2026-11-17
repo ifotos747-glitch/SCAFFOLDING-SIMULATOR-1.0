@@ -29,8 +29,14 @@ jobs:
           mkdir -p dist
           godot --headless --path . --export-release "Windows Desktop" dist/SCAFFOLDING-SIMULATOR.exe
           test -s dist/SCAFFOLDING-SIMULATOR.exe
+      - name: Create Windows installer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nsis
+          makensis installer.nsi
+          test -s dist/SCAFFOLDING-SIMULATOR-3.0-SETUP.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: SCAFFOLDING-SIMULATOR-2.0-WINDOWS
+          name: SCAFFOLDING-SIMULATOR-3.0-WINDOWS
           path: dist/
           if-no-files-found: error
