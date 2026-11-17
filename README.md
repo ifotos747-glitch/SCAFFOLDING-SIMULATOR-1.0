@@ -1,10 +1,8 @@
-# SCAFFOLDING SIMULATOR 2.0 — CONSTRUCTION EMPIRE
-Godot 4.4.1 / Windows x64.
-- Tryb kreatywny i kariera, magazyn, sklep, kontrakty, pieniądze.
-- 1–8 wybór elementu, R obrót, Enter montaż, Delete demontaż, Q/E wysokość.
-- V zmiana kamery orbitalnej na FPS, WASD ruch, mysz rozglądanie, LPM/PPM montaż/demontaż, Esc uwolnienie myszy.
-- Tab centrum firmy: wybierz karierę, kup wybrany wcześniej element, odbierz nagrodę po spełnieniu wymagań kontraktu.
-- F5/F9 zapis i odczyt. Zapis 1.0 jest w innym katalogu Godot; skopiuj construction.json z katalogu app_userdata/SCAFFOLDING SIMULATOR 1.0 do app_userdata/SCAFFOLDING SIMULATOR 2.0, aby go przenieść.
-- Widok FPS nie ma kolizji ani wspinania; kontrakty są uproszczonymi celami ilościowymi, nie rzeczywistymi obliczeniami konstrukcji. Częściowe etykiety EN, przełącznik cieni. Brak instalatora.
-## Kompilacja
-Actions > Build SCAFFOLDING SIMULATOR > artefakt SCAFFOLDING-SIMULATOR-2.0-WINDOWS. Rozpakuj i uruchom EXE.
+# SCAFFOLDING SIMULATOR 3.0 — REALISTIC CONSTRUCTION
+Godot 4.4.1 / Windows x64. Creative, career, warehouse, shop, contracts.
+- 1–9 element selection (9 frame), R rotation, Enter/Delete build/remove, Q/E height.
+- V FPS, WASD movement, mouse look, LMB/RMB build/remove, Space jump or climb near ladder, Ctrl descend ladder, Shift sprint, B snap toggle.
+- Tab company center, F5 save, F9 load, Esc release mouse.
+- Gravity, collision meshes, fall damage and respawn. Snap is a simple grid endpoint aid, not structural validation. Stairs may require jumping. Menu and partial English labels.
+- To migrate 2.0 saves if not visible, copy construction.json and career.json from %APPDATA%/Godot/app_userdata/SCAFFOLDING SIMULATOR 2.0 to %APPDATA%/SCAFFOLDING SIMULATOR 2.0. Back up originals.
+- GitHub Actions builds portable EXE and NSIS installer. Runtime and installer require testing.
