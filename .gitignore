@@ -1,0 +1,5 @@
+.godot/
+.gradle/
+build/
+run/
+dist/
