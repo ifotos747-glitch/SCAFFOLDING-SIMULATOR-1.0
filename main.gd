@@ -10,6 +10,19 @@ var ghost: Node3D
 var angle := 0.7
 var distance := 15.0
 var message := "Tryb kreatywny"
+var career := false
+var money := 1000
+var stock := [12,12,6,6,8,4,6,4]
+const PRICES = [35,25,30,50,15,55,35,80]
+var contract := 0
+var career_keys := {}
+var walking := false
+var eye := Vector3(3,1.7,5)
+var yaw := 0.0
+var pitch := -0.25
+var menu: PanelContainer
+var menu_label: Label
+var language := false
 func _ready():
  var env := WorldEnvironment.new()
  env.environment = Environment.new()
@@ -40,6 +53,7 @@ func _ready():
  hud.add_theme_constant_override("shadow_offset_x",2)
  hud.add_theme_constant_override("shadow_offset_y",2)
  layer.add_child(hud)
+ setup_menu(layer)
  refresh()
 func box(parent: Node3D, size: Vector3, pos: Vector3, color: Color) -> MeshInstance3D:
  var mesh := MeshInstance3D.new()
@@ -88,9 +102,13 @@ func refresh():
  ghost.position = Vector3(cursor)
  ghost.rotation.y = rotation_step*PI/2
  var target := Vector3(cursor)+Vector3(0,1,0)
- cam.position = target + Vector3(cos(angle)*distance,distance*0.65,sin(angle)*distance)
- cam.look_at(target)
- hud.text = "SCAFFOLDING SIMULATOR 1.0 | %s | Elementy: %d\n1–8: wybór (%s) | R: obrót | Enter: montaż | Delete: demontaż\nWASD: pozycja | Q/E: wysokość | strzałki: kamera | F5: zapis | F9: wczytaj\nPozycja: %s | %s" % [message,pieces.size(),NAMES[selected],str(cursor),"Podgląd zielony"]
+ if not walking:
+  cam.position = target + Vector3(cos(angle)*distance,distance*0.65,sin(angle)*distance)
+  cam.look_at(target)
+ hud.text = "SCAFFOLDING SIMULATOR 2.0 | %s | Elementy: %d\n1–8: wybór (%s) | R: obrót | Enter: montaż | Delete: demontaż\nWASD: pozycja | Q/E: wysokość | strzałki: kamera | F5: zapis | F9: wczytaj\nPozycja: %s | %s" % [message,pieces.size(),NAMES[selected],str(cursor),"Podgląd zielony"]
+ hud.text += "\nTab: centrum firmy | V: widok FPS | LPM/PPM: montaż/demontaż (FPS) | Esc: uwolnij mysz\n"
+ hud.text += ("CAREER" if career else "CREATIVE") + " | PLN %d | Magazyn: %d | Kontrakt %d" % [money,stock[selected],contract+1]
+ if is_instance_valid(menu_label): update_menu()
 func place(p: Vector3i,k: int,r: int):
  var key := key_for(p,k,r)
  if pieces.has(key): return
@@ -102,6 +120,21 @@ func place(p: Vector3i,k: int,r: int):
 func _unhandled_key_input(event):
  if not event.pressed or event.echo: return
  var key: int = event.keycode
+ if key == KEY_TAB:
+  menu.visible = not menu.visible
+  Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if menu.visible or not walking else Input.MOUSE_MODE_CAPTURED
+  update_menu()
+  return
+ if key == KEY_V:
+  walking = not walking
+  Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if walking and not menu.visible else Input.MOUSE_MODE_VISIBLE
+  refresh()
+  return
+ if key == KEY_ESCAPE:
+  Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+  return
+ if menu.visible: return
+ if walking and key in [KEY_W,KEY_A,KEY_S,KEY_D]: return
  if key >= KEY_1 and key <= KEY_8: selected = key-KEY_1
  else:
   match key:
@@ -116,16 +149,16 @@ func _unhandled_key_input(event):
    KEY_RIGHT: angle += 0.15
    KEY_UP: distance = maxf(4,distance-1)
    KEY_DOWN: distance = minf(35,distance+1)
-   KEY_ENTER: place(cursor,selected,rotation_step)
+   KEY_ENTER: build_selected()
    KEY_DELETE:
-    var id := key_for(cursor,selected,rotation_step)
-    if pieces.has(id):
-     pieces[id].queue_free()
-     pieces.erase(id)
+    remove_selected()
    KEY_F5:
     var f := FileAccess.open("user://construction.json",FileAccess.WRITE)
     if f: f.store_string(JSON.stringify(pieces.keys())); message = "Zapisano"
-   KEY_F9: load_world()
+    save_career()
+   KEY_F9:
+    load_world()
+    load_career()
  cursor = Vector3i(clampi(cursor.x,-14,14),clampi(cursor.y,0,30),clampi(cursor.z,-14,14))
  refresh()
 func load_world():
@@ -142,3 +175,136 @@ func load_world():
   var r := int(a[4])
   if k>=0 and k<8 and r>=0 and r<4: place(Vector3i(int(a[0]),int(a[1]),int(a[2])),k,r)
  message = "Wczytano"
+
+func setup_menu(layer: CanvasLayer):
+ menu = PanelContainer.new()
+ menu.position = Vector2(18,180)
+ layer.add_child(menu)
+ var v := VBoxContainer.new()
+ menu.add_child(v)
+ menu_label = Label.new()
+ v.add_child(menu_label)
+ for pair in [["Tryb kreatywny / kariera",toggle_mode],["Kup wybrany element +1",buy],["Odbierz nagrodę za kontrakt",claim],["Zmień widok kamery",toggle_view],["Cienie ON/OFF",toggle_shadows],["PL / EN (panel)",toggle_language],["Zamknij / Close",close_menu]]:
+  var b := Button.new()
+  b.text = pair[0]
+  b.pressed.connect(pair[1])
+  v.add_child(b)
+ menu.visible = false
+ update_menu()
+func update_menu():
+ var target := 8 + contract*4
+ var counts := [0,0,0,0,0,0,0,0]
+ for id in career_keys:
+  if pieces.has(id):
+   var a = id.split(",")
+   counts[int(a[3])] += 1
+ menu_label.text = ("COMPANY CENTER / Warehouse" if language else "CENTRUM FIRMY / MAGAZYN") + "\nPLN %d | %s\n" % [money,"CAREER" if career else "CREATIVE"]
+ for i in range(8):
+  menu_label.text += "%s: %d | PLN %d\n" % [NAMES[i],stock[i],PRICES[i]]
+ menu_label.text += "Contract %d: %d/%d | Stojaki/standards %d/2 | Podesty/decks %d/2\n%s" % [contract+1,career_keys.size(),target,counts[0],counts[3],message]
+func toggle_mode():
+ career = not career
+ message = "Kariera / Career" if career else "Kreatywny / Creative"
+ refresh()
+func buy():
+ if money < PRICES[selected]:
+  message = "Brak środków"
+ else:
+  money -= PRICES[selected]
+  stock[selected] += 1
+  message = "Kupiono / Purchased"
+ refresh()
+func claim():
+ var standards := 0
+ var decks := 0
+ for id in career_keys:
+  var a = id.split(",")
+  if int(a[3]) == 0: standards += 1
+  if int(a[3]) == 3: decks += 1
+ if career and career_keys.size() >= 8+contract*4 and standards >= 2 and decks >= 2:
+  money += 600+contract*250
+  contract += 1
+  career_keys.clear()
+  message = "Kontrakt ukończony!"
+ else: message = "Wymagania kontraktu nie zostały spełnione"
+ refresh()
+func toggle_view():
+ walking = not walking
+ refresh()
+func toggle_shadows():
+ for child in get_children():
+  if child is DirectionalLight3D: child.shadow_enabled = not child.shadow_enabled
+func toggle_language():
+ language = not language
+ update_menu()
+func close_menu():
+ menu.hide()
+ Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if walking else Input.MOUSE_MODE_VISIBLE
+func build_selected():
+ var id := key_for(cursor,selected,rotation_step)
+ if pieces.has(id): return
+ if career:
+  if stock[selected] <= 0:
+   message = "Brak materiałów"
+   return
+  stock[selected] -= 1
+  career_keys[id] = true
+ place(cursor,selected,rotation_step)
+func remove_selected():
+ var id := key_for(cursor,selected,rotation_step)
+ if pieces.has(id):
+  pieces[id].queue_free()
+  pieces.erase(id)
+  if career_keys.has(id):
+   stock[selected] += 1
+   career_keys.erase(id)
+func save_career():
+ var f := FileAccess.open("user://career.json",FileAccess.WRITE)
+ if f: f.store_string(JSON.stringify({"money":money,"stock":stock,"contract":contract,"keys":career_keys.keys(),"career":career}))
+func load_career():
+ if not FileAccess.file_exists("user://career.json"): return
+ var d = JSON.parse_string(FileAccess.get_file_as_string("user://career.json"))
+ if not d is Dictionary: return
+ money = int(d.get("money",1000))
+ contract = int(d.get("contract",0))
+ career = bool(d.get("career",false))
+ var saved = d.get("stock",[])
+ if saved is Array and saved.size()==8:
+  for i in range(8): stock[i] = int(saved[i])
+ career_keys.clear()
+ for id in d.get("keys",[]):
+  if pieces.has(id): career_keys[id] = true
+func _process(delta):
+ if not walking or menu.visible or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED: return
+ var move := Vector3.ZERO
+ var forward := Vector3(-sin(yaw),0,-cos(yaw))
+ var right := Vector3(cos(yaw),0,-sin(yaw))
+ if Input.is_physical_key_pressed(KEY_W): move += forward
+ if Input.is_physical_key_pressed(KEY_S): move -= forward
+ if Input.is_physical_key_pressed(KEY_D): move += right
+ if Input.is_physical_key_pressed(KEY_A): move -= right
+ eye += move.normalized()*delta*5.0
+ eye.x = clampf(eye.x,-14,14)
+ eye.z = clampf(eye.z,-14,14)
+ cam.position = eye
+ cam.rotation = Vector3(pitch,yaw,0)
+ var point := eye - cam.global_transform.basis.z*4.0
+ if pitch < -0.1:
+  var t := (float(cursor.y)-eye.y)/(-cam.global_transform.basis.z.y)
+  if t > 0 and t < 12: point = eye-cam.global_transform.basis.z*t
+ var next := Vector3i(clampi(roundi(point.x),-14,14),cursor.y,clampi(roundi(point.z),-14,14))
+ if next != cursor:
+  cursor = next
+  refresh()
+func _unhandled_input(event):
+ if not walking or menu.visible: return
+ if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+  yaw -= event.relative.x*0.003
+  pitch = clampf(pitch-event.relative.y*0.003,-1.4,1.4)
+ if event is InputEventMouseButton and event.pressed:
+  if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+   Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+   return
+  if event.button_index == MOUSE_BUTTON_LEFT: build_selected()
+  if event.button_index == MOUSE_BUTTON_RIGHT: remove_selected()
+  refresh()
