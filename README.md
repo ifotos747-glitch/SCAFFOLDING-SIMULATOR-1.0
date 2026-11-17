@@ -1,8 +1,8 @@
-# SCAFFOLDING SIMULATOR 3.0 — REALISTIC CONSTRUCTION
-Godot 4.4.1 / Windows x64. Creative, career, warehouse, shop, contracts.
-- 1–9 element selection (9 frame), R rotation, Enter/Delete build/remove, Q/E height.
-- V FPS, WASD movement, mouse look, LMB/RMB build/remove, Space jump or climb near ladder, Ctrl descend ladder, Shift sprint, B snap toggle.
-- Tab company center, F5 save, F9 load, Esc release mouse.
-- Gravity, collision meshes, fall damage and respawn. Snap is a simple grid endpoint aid, not structural validation. Stairs may require jumping. Menu and partial English labels.
-- To migrate 2.0 saves if not visible, copy construction.json and career.json from %APPDATA%/Godot/app_userdata/SCAFFOLDING SIMULATOR 2.0 to %APPDATA%/SCAFFOLDING SIMULATOR 2.0. Back up originals.
-- GitHub Actions builds portable EXE and NSIS installer. Runtime and installer require testing.
+# SCAFFOLDING SIMULATOR 4.0 — INDUSTRIAL WORLD
+Godot 4.4.1 / Windows x64. 33 choices (9 base models and 24 scaled variants). Existing career, inventory, construction and FPS controls retained.
+- TAB: catalog, shop and delivery order. 1–9 or brackets [ ]: choose material.
+- F7: toggle optional collapse simulation (off by default). F8: report unsupported parts without destroying them. Simplified grid connectivity, not an engineering analysis. When enabled, disconnected parts collapse every two seconds and materials are lost.
+- C: unload ordered delivery with a scripted crane animation. In career, order 10 selected parts for the price of 8.
+- Industrial training site: refinery tanks, factory, bridge and tower crane on the existing map.
+- F5/F9: saves; unchanged user directory, older stock arrays supported. Back up saves before testing collapse.
+- Actions builds portable and NSIS installer. Runtime tests pending; geometry procedural, no independent maps or freely controlled crane.
