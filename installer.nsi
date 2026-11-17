@@ -1,6 +1,6 @@
 Unicode true
-Name "SCAFFOLDING SIMULATOR 3.0"
-OutFile "dist/SCAFFOLDING-SIMULATOR-3.0-SETUP.exe"
+Name "SCAFFOLDING SIMULATOR 4.0"
+OutFile "dist/SCAFFOLDING-SIMULATOR-4.0-SETUP.exe"
 InstallDir "$LOCALAPPDATA\SCAFFOLDING SIMULATOR"
 RequestExecutionLevel user
 Page directory
