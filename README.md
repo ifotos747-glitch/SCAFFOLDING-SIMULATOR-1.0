@@ -1,6 +1,10 @@
-# SCAFFOLDING SIMULATOR 1.0
-Prototyp 3D w trybie kreatywnym. Godot 4.4.1, Windows x64. Modele proceduralne, kamera orbitalna, 8 elementów, montaż/demontaż, lokalny zapis F5/F9. Nie jest narzędziem do obliczeń konstrukcyjnych. Brak fizyki, kariery i multiplayera.
-## Uruchomienie
-Otwórz project.godot w Godot 4.4.1 i naciśnij F6/F5 (uruchom projekt F5). Sterowanie w HUD. Enter montuje element, Delete usuwa element o aktualnym typie i obrocie. Q/E wysokość, WASD położenie, strzałki kamera.
-## GitHub
-Rozpakuj ZIP, wgraj zawartość do katalogu głównego repozytorium, w tym .github/workflows/build.yml. Actions > Build SCAFFOLDING SIMULATOR > Run workflow. Po sukcesie pobierz artefakt WINDOWS i rozpakuj. EXE bez instalatora. Kompilacja nie została wykonana w środowisku autora.
+# SCAFFOLDING SIMULATOR 2.0 — CONSTRUCTION EMPIRE
+Godot 4.4.1 / Windows x64.
+- Tryb kreatywny i kariera, magazyn, sklep, kontrakty, pieniądze.
+- 1–8 wybór elementu, R obrót, Enter montaż, Delete demontaż, Q/E wysokość.
+- V zmiana kamery orbitalnej na FPS, WASD ruch, mysz rozglądanie, LPM/PPM montaż/demontaż, Esc uwolnienie myszy.
+- Tab centrum firmy: wybierz karierę, kup wybrany wcześniej element, odbierz nagrodę po spełnieniu wymagań kontraktu.
+- F5/F9 zapis i odczyt. Zapis 1.0 jest w innym katalogu Godot; skopiuj construction.json z katalogu app_userdata/SCAFFOLDING SIMULATOR 1.0 do app_userdata/SCAFFOLDING SIMULATOR 2.0, aby go przenieść.
+- Widok FPS nie ma kolizji ani wspinania; kontrakty są uproszczonymi celami ilościowymi, nie rzeczywistymi obliczeniami konstrukcji. Częściowe etykiety EN, przełącznik cieni. Brak instalatora.
+## Kompilacja
+Actions > Build SCAFFOLDING SIMULATOR > artefakt SCAFFOLDING-SIMULATOR-2.0-WINDOWS. Rozpakuj i uruchom EXE.
